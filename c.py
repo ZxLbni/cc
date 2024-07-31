@@ -13,7 +13,7 @@ OWNER_ID = 7427691214  # Owner's Telegram ID
 bot = telebot.TeleBot(TOKEN)
 
 # Define the API endpoint and static parameters
-url = "https://daxxteam.com/chk/api.php"
+url = "https://daxxteam.com/chk/chk.php"
 
 # Event to control the stopping of the card check process
 stop_event = Event()
@@ -143,7 +143,7 @@ def check_card(message):
         bot.send_message(message.chat.id, "Please provide card details in the format `cc|mm|yyyy|cvv`.")
         return
 
-    stop_event.clear()  # Clear the stop event before starting the process
+    stop_event.clear()
 
     for card in card_details:
         if stop_event.is_set():
@@ -158,7 +158,7 @@ def check_card(message):
         params = {
             'lista': card,
             'mode': 'cvv',
-            'amount': 1,
+            'amount': 0.5,
             'currency': 'eur'
         }
         response = requests.get(url, params=params)
@@ -167,25 +167,14 @@ def check_card(message):
         if response.headers.get('Content-Type') == 'application/json':
             try:
                 response_data = response.json()
-                status = response_data.get("status", "--")
-                response_text = response_data.get("response", "No response")
+                bot.send_message(message.chat.id, response_data.get("response", "No response"))
             except requests.exceptions.JSONDecodeError:
                 bot.send_message(message.chat.id, f"Failed to decode JSON response. Response content: {response.text}")
                 continue
         else:
-            status = "Declined ❌️"
-            response_text = response.text
+            bot.send_message(message.chat.id, response.text)
 
-        time_taken = round(end_time - start_time, 2)
-
-        formatted_response = (
-            f"CARD:- {card}\n"
-            f"RESPONSE:- {response_text}\n"
-            f"TIME:- {time_taken} seconds"
-        )
-
-        bot.send_message(message.chat.id, formatted_response)
-        time.sleep(10)  # Add delay to avoid rate limits
+        time.sleep(10)
 
 # Document handler
 @bot.message_handler(content_types=['document'])
@@ -209,7 +198,7 @@ def handle_file(message):
         with open('lista.txt', 'r') as f:
             lista_values = f.readlines()
         
-        stop_event.clear()  # Clear the stop event before starting the process
+        stop_event.clear()
 
         for lista in lista_values:
             if stop_event.is_set():
@@ -226,7 +215,7 @@ def handle_file(message):
                 params = {
                     'lista': lista,
                     'mode': 'cvv',
-                    'amount': 1,
+                    'amount': 0.5,
                     'currency': 'eur'
                 }
                 response = requests.get(url, params=params)
@@ -235,25 +224,14 @@ def handle_file(message):
                 if response.headers.get('Content-Type') == 'application/json':
                     try:
                         response_data = response.json()
-                        status = response_data.get("status", "--")
-                        response_text = response_data.get("response", "No response")
+                        bot.send_message(message.chat.id, response_data.get("response", "No response"))
                     except requests.exceptions.JSONDecodeError:
                         bot.send_message(message.chat.id, f"Failed to decode JSON response. Response content: {response.text}")
                         continue
                 else:
-                    status = "Declined ❌️"
-                    response_text = response.text
+                    bot.send_message(message.chat.id, response.text)
 
-                time_taken = round(end_time - start_time, 2)
-
-                formatted_response = (
-                    f"CARD:- {lista}\n"
-                    f"RESPONSE:- {response_text}\n"
-                    f"TIME:- {time_taken} seconds"
-                )
-
-                bot.send_message(message.chat.id, formatted_response)
-                time.sleep(10)  # Add delay to avoid rate limits
+                time.sleep(10)
 
 # /stop command handler
 @bot.message_handler(commands=['stop'])
@@ -264,7 +242,7 @@ def stop_process(message):
     else:
         bot.send_message(message.chat.id, "You are not authorized to use this command.")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    bot.polling()
-              
+    bot.polling(none_stop=True)
+    
