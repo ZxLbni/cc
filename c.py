@@ -15,7 +15,7 @@ OWNER_ID = 7427691214  # Owner's Telegram ID
 bot = telebot.TeleBot(TOKEN)
 
 # Define the API endpoint and static parameters
-url = "https://daxxteam.com/gate/chk.php"
+url = "https://daxxteam.com/chk/chk.php"
 
 # Event to control the stopping of the card check process
 stop_event = Event()
@@ -74,29 +74,29 @@ def generate_random_code(length=10):
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     if message.from_user.id in blocked_users:
-        bot.reply_to(message, "❌ YOU ARE BLOCKED FROM USING THIS BOT.")
+        bot.reply_to(message, "❌ You are blocked from using this bot.")
         return
-    bot.send_message(message.chat.id, "👋 WELCOME! USE /REGISTER TO REGISTER AND GET 10 CREDITS. USE THE /CHK COMMAND FOLLOWED BY CARD DETAILS IN THE FORMAT `CC|MM|YYYY|CVV`, OR SEND A TXT FILE WITH CARD DETAILS. USE /STOP TO STOP THE CARD CHECK PROCESS.")
+    bot.send_message(message.chat.id, "👋 Welcome! Use /register to register and get 10 credits. Use the /chk command followed by card details in the format `cc|mm|yyyy|cvv`, or send a TXT file with card details. Use /stop to stop the card check process.")
 
 # /cmds command handler
 @bot.message_handler(commands=['cmds'])
 def send_cmds(message):
     cmds_message = (
-        "📋 AVAILABLE COMMANDS:\n"
-        "/START - WELCOME MESSAGE\n"
-        "/CMDS - LIST ALL COMMANDS\n"
-        "/REGISTER - REGISTER AND GET 10 CREDITS\n"
-        "/INFO - GET YOUR INFORMATION\n"
-        "/ADD - AUTHORIZE A GROUP OR USER\n"
-        "/REMOVE - UNAUTHORIZE A GROUP OR USER\n"
-        "/CHK - CHECK CARD DETAILS\n"
-        "/STOP - STOP THE CARD CHECK PROCESS\n"
-        "/BUY - VIEW CREDIT PACKAGES AND PRICING\n"
-        "/BLOCK - BLOCK A USER\n"
-        "/UNBLOCK - UNBLOCK A USER\n"
-        "/GET_CREDIT <NUMBER> - GENERATE CREDIT CODE\n"
-        "/REDEEM <CODE> - REDEEM A CREDIT CODE\n"
-        "/USE <CODE> - REDEEM A CREDIT CODE\n"
+        "📋 Available commands:\n"
+        "/start - Welcome message\n"
+        "/cmds - List all commands\n"
+        "/register - Register and get 10 credits\n"
+        "/info - Get your information\n"
+        "/add - Authorize a group or user\n"
+        "/remove - Unauthorize a group or user\n"
+        "/chk - Check card details\n"
+        "/stop - Stop the card check process\n"
+        "/buy - View credit packages and pricing\n"
+        "/block - Block a user\n"
+        "/unblock - Unblock a user\n"
+        "/get_credit <number> - Generate credit code\n"
+        "/redeem <code> - Redeem a credit code\n"
+        "/use <code> - Redeem a credit code\n"
     )
     bot.reply_to(message, cmds_message)
 
@@ -104,40 +104,40 @@ def send_cmds(message):
 @bot.message_handler(commands=['register'])
 def register_user(message):
     if message.from_user.id in blocked_users:
-        bot.reply_to(message, "❌ YOU ARE BLOCKED FROM USING THIS BOT.")
+        bot.reply_to(message, "❌ You are blocked from using this bot.")
         return
     user_id = message.from_user.id
     if user_id in user_credits:
-        bot.reply_to(message, "✅ YOU ARE ALREADY REGISTERED.")
+        bot.reply_to(message, "✅ You are already registered.")
         return
     
     user_credits[user_id] = 10
     save_user_credits()
-    bot.reply_to(message, "🎉 YOU HAVE BEEN REGISTERED AND RECEIVED 10 CREDITS.")
+    bot.reply_to(message, "🎉 You have been registered and received 10 credits.")
 
 # /info command handler
 @bot.message_handler(commands=['info'])
 def user_info(message):
     if message.from_user.id in blocked_users:
-        bot.reply_to(message, "❌ YOU ARE BLOCKED FROM USING THIS BOT.")
+        bot.reply_to(message, "❌ You are blocked from using this bot.")
         return
     user_id = message.from_user.id
     if user_id not in user_credits and user_id != OWNER_ID:
-        bot.reply_to(message, "❌ YOU ARE NOT REGISTERED. USE /REGISTER TO REGISTER.")
+        bot.reply_to(message, "❌ You are not registered. Use /register to register.")
         return
 
-    credits = "UNLIMITED" if user_id == OWNER_ID else user_credits.get(user_id, 0)
-    rank = "OWNER" if user_id == OWNER_ID else "PREMIUM" if credits > 0 else "FREE"
+    credits = "Unlimited" if user_id == OWNER_ID else user_credits.get(user_id, 0)
+    rank = "Owner" if user_id == OWNER_ID else "Premium" if credits > 0 else "Free"
     username = message.from_user.username or "N/A"
     full_name = f"{message.from_user.first_name} {message.from_user.last_name or ''}".strip()
     
     info_message = (
-        f"ℹ️ USER INFORMATION:\n"
-        f"👤 USERNAME: {username}\n"
-        f"🆔 USER ID: {user_id}\n"
-        f"📛 FULL NAME: {full_name}\n"
-        f"💰 CREDITS: {credits}\n"
-        f"🔰 RANK: {rank}\n"
+        f"ℹ️ User information:\n"
+        f"👤 Username: {username}\n"
+        f"🆔 User ID: {user_id}\n"
+        f"📛 Full Name: {full_name}\n"
+        f"💰 Credits: {credits}\n"
+        f"🔰 Rank: {rank}\n"
     )
     bot.reply_to(message, info_message)
 
@@ -145,12 +145,12 @@ def user_info(message):
 @bot.message_handler(commands=['add'])
 def add_authorization(message):
     if message.from_user.id != OWNER_ID:
-        bot.reply_to(message, "❌ YOU ARE NOT AUTHORIZED TO USE THIS COMMAND.")
+        bot.reply_to(message, "❌ You are not authorized to use this command.")
         return
 
     args = message.text.split()
     if len(args) < 3:
-        bot.reply_to(message, "ℹ️ USAGE: /ADD GROUP <GROUP_ID> OR /ADD <USER_ID> <CREDITS>")
+        bot.reply_to(message, "ℹ️ Usage: /add group <group_id> or /add <user_id> <credits>")
         return
 
     if args[1] == 'group':
@@ -158,30 +158,30 @@ def add_authorization(message):
         if group_id not in authorized_groups:
             authorized_groups.append(group_id)
             save_authorized_groups()
-            bot.reply_to(message, f"✅ GROUP {group_id} HAS BEEN AUTHORIZED FOR CC CHECKS.")
+            bot.reply_to(message, f"✅ Group {group_id} has been authorized for CC checks.")
         else:
-            bot.reply_to(message, f"ℹ️ GROUP {group_id} IS ALREADY AUTHORIZED.")
+            bot.reply_to(message, f"ℹ️ Group {group_id} is already authorized.")
 
     else:
         if len(args) != 3:
-            bot.reply_to(message, "ℹ️ USAGE: /ADD <USER_ID> <CREDITS>")
+            bot.reply_to(message, "ℹ️ Usage: /add <user_id> <credits>")
             return
         user_id = int(args[1])
         credits = int(args[2])
         user_credits[user_id] = user_credits.get(user_id, 0) + credits
         save_user_credits()
-        bot.reply_to(message, f"✅ USER {user_id} HAS BEEN AUTHORIZED WITH {credits} CREDITS.")
+        bot.reply_to(message, f"✅ User {user_id} has been authorized with {credits} credits.")
 
 # /remove command handler to unauthorize a group or user
 @bot.message_handler(commands=['remove'])
 def remove_authorization(message):
     if message.from_user.id != OWNER_ID:
-        bot.reply_to(message, "❌ YOU ARE NOT AUTHORIZED TO USE THIS COMMAND.")
+        bot.reply_to(message, "❌ You are not authorized to use this command.")
         return
 
     args = message.text.split()
     if len(args) != 3:
-        bot.reply_to(message, "ℹ️ USAGE: /REMOVE GROUP <GROUP_ID> OR /REMOVE USERID <USER_ID>")
+        bot.reply_to(message, "ℹ️ Usage: /remove group <group_id> or /remove userid <user_id>")
         return
 
     if args[1] == 'group':
@@ -189,47 +189,47 @@ def remove_authorization(message):
         if group_id in authorized_groups:
             authorized_groups.remove(group_id)
             save_authorized_groups()
-            bot.reply_to(message, f"✅ GROUP {group_id} HAS BEEN UNAUTHORIZED.")
+            bot.reply_to(message, f"✅ Group {group_id} has been unauthorized.")
         else:
-            bot.reply_to(message, f"ℹ️ GROUP {group_id} IS NOT AUTHORIZED.")
+            bot.reply_to(message, f"ℹ️ Group {group_id} is not authorized.")
 
     elif args[1] == 'userid':
         user_id = int(args[2])
         if user_id in user_credits:
             del user_credits[user_id]
             save_user_credits()
-            bot.reply_to(message, f"✅ USER {user_id} HAS BEEN UNAUTHORIZED.")
+            bot.reply_to(message, f"✅ User {user_id} has been unauthorized.")
         else:
-            bot.reply_to(message, f"ℹ️ USER {user_id} IS NOT AUTHORIZED.")
+            bot.reply_to(message, f"ℹ️ User {user_id} is not authorized.")
 
     else:
-        bot.reply_to(message, "❌ INVALID TYPE. USE 'GROUP' OR 'USERID'.")
+        bot.reply_to(message, "❌ Invalid type. Use 'group' or 'userid'.")
 
 # /chk command handler
 @bot.message_handler(commands=['chk'])
 def check_card(message):
     if message.from_user.id in blocked_users:
-        bot.reply_to(message, "❌ YOU ARE BLOCKED FROM USING THIS BOT.")
+        bot.reply_to(message, "❌ You are blocked from using this bot.")
         return
     user_id = message.from_user.id
     if user_id != OWNER_ID and user_id not in user_credits and message.chat.id not in authorized_groups:
-        bot.reply_to(message, "❌ YOU ARE NOT AUTHORIZED TO USE THIS COMMAND.")
+        bot.reply_to(message, "❌ You are not authorized to use this command.")
         return
 
     if user_id != OWNER_ID and user_credits.get(user_id, 0) <= 0:
-        bot.reply_to(message, "❌ YOU DON'T HAVE ENOUGH CREDITS TO USE THIS COMMAND.")
+        bot.reply_to(message, "❌ You don't have enough credits to use this command.")
         return
 
     card_details = message.text.split()[1:]
     if not card_details:
-        bot.reply_to(message, "ℹ️ PLEASE PROVIDE CARD DETAILS IN THE FORMAT `CC|MM|YYYY|CVV`.")
+        bot.reply_to(message, "ℹ️ Please provide card details in the format `cc|mm|yyyy|cvv`.")
         return
 
     stop_event.clear()
 
     for card in card_details:
         if stop_event.is_set():
-            bot.reply_to(message, "🛑 CARD CHECK PROCESS STOPPED.")
+            bot.reply_to(message, "🛑 Card check process stopped.")
             break
 
         if user_id != OWNER_ID:
@@ -247,15 +247,15 @@ def check_card(message):
             response = requests.get(url, params=params)
             end_time = time.time()
         except requests.exceptions.RequestException as e:
-            bot.reply_to(message, f"❌ ERROR CONNECTING TO API: {e}")
+            bot.reply_to(message, f"❌ Error connecting to API: {e}")
             continue
         
         if response.headers.get('Content-Type') == 'application/json':
             try:
                 response_data = response.json()
-                bot.reply_to(message, response_data.get("response", "ℹ️ NO RESPONSE"))
+                bot.reply_to(message, response_data.get("response", "ℹ️ No response"))
             except requests.exceptions.JSONDecodeError:
-                bot.reply_to(message, f"❌ FAILED TO DECODE JSON RESPONSE. RESPONSE CONTENT: {response.text}")
+                bot.reply_to(message, f"❌ Failed to decode JSON response. Response content: {response.text}")
                 continue
         else:
             bot.reply_to(message, response.text)
@@ -266,15 +266,15 @@ def check_card(message):
 @bot.message_handler(content_types=['document'])
 def handle_file(message):
     if message.from_user.id in blocked_users:
-        bot.reply_to(message, "❌ YOU ARE BLOCKED FROM USING THIS BOT.")
+        bot.reply_to(message, "❌ You are blocked from using this bot.")
         return
     user_id = message.from_user.id
     if user_id not in user_credits and user_id != OWNER_ID:
-        bot.reply_to(message, "❌ YOU ARE NOT REGISTERED. USE /REGISTER TO REGISTER.")
+        bot.reply_to(message, "❌ You are not registered. Use /register to register.")
         return
 
     if user_id != OWNER_ID and user_credits.get(user_id, 0) <= 0:
-        bot.reply_to(message, "❌ YOU DON'T HAVE ENOUGH CREDITS TO USE THIS COMMAND.")
+        bot.reply_to(message, "❌ You don't have enough credits to use this command.")
         return
 
     if message.document.mime_type == 'text/plain':
@@ -291,7 +291,7 @@ def handle_file(message):
 
         for lista in lista_values:
             if stop_event.is_set():
-                bot.reply_to(message, "🛑 CARD CHECK PROCESS STOPPED.")
+                bot.reply_to(message, "🛑 Card check process stopped.")
                 break
 
             if user_id != OWNER_ID:
@@ -311,15 +311,15 @@ def handle_file(message):
                     response = requests.get(url, params=params)
                     end_time = time.time()
                 except requests.exceptions.RequestException as e:
-                    bot.reply_to(message, f"❌ ERROR CONNECTING TO API: {e}")
+                    bot.reply_to(message, f"❌ Error connecting to API: {e}")
                     continue
                 
                 if response.headers.get('Content-Type') == 'application/json':
                     try:
                         response_data = response.json()
-                        bot.reply_to(message, response_data.get("response", "ℹ️ NO RESPONSE"))
+                        bot.reply_to(message, response_data.get("response", "ℹ️ No response"))
                     except requests.exceptions.JSONDecodeError:
-                        bot.reply_to(message, f"❌ FAILED TO DECODE JSON RESPONSE. RESPONSE CONTENT: {response.text}")
+                        bot.reply_to(message, f"❌ Failed to decode JSON response. Response content: {response.text}")
                         continue
                 else:
                     bot.reply_to(message, response.text)
@@ -331,19 +331,19 @@ def handle_file(message):
 def stop_process(message):
     if message.from_user.id == OWNER_ID:
         stop_event.set()
-        bot.reply_to(message, "🛑 CARD CHECK PROCESS HAS BEEN STOPPED.")
+        bot.reply_to(message, "🛑 Card check process has been stopped.")
     else:
-        bot.reply_to(message, "❌ YOU ARE NOT AUTHORIZED TO USE THIS COMMAND.")
+        bot.reply_to(message, "❌ You are not authorized to use this command.")
 
 # /buy command handler
 @bot.message_handler(commands=['buy'])
 def buy_credits(message):
     buy_message = (
-        "💳 CREDIT PACKAGES:\n"
-        "100 CREDITS - $1\n"
-        "500 CREDITS - $5\n"
-        "1000 CREDITS - $8\n"
-        "CONTACT @YourExDestiny TO PURCHASE."
+        "💳 Credit packages:\n"
+        "100 credits - $1\n"
+        "500 credits - $5\n"
+        "1000 credits - $8\n"
+        "Contact @YourExDestiny to purchase."
     )
     bot.reply_to(message, buy_message)
 
@@ -351,70 +351,70 @@ def buy_credits(message):
 @bot.message_handler(commands=['block'])
 def block_user(message):
     if message.from_user.id != OWNER_ID:
-        bot.reply_to(message, "❌ YOU ARE NOT AUTHORIZED TO USE THIS COMMAND.")
+        bot.reply_to(message, "❌ You are not authorized to use this command.")
         return
 
     args = message.text.split()
     if len(args) != 2:
-        bot.reply_to(message, "ℹ️ USAGE: /BLOCK <USER_ID>")
+        bot.reply_to(message, "ℹ️ Usage: /block <user_id>")
         return
 
     user_id = int(args[1])
     if user_id not in blocked_users:
         blocked_users.append(user_id)
         save_blocked_users()
-        bot.reply_to(message, f"✅ USER {user_id} HAS BEEN BLOCKED.")
+        bot.reply_to(message, f"✅ User {user_id} has been blocked.")
     else:
-        bot.reply_to(message, f"ℹ️ USER {user_id} IS ALREADY BLOCKED.")
+        bot.reply_to(message, f"ℹ️ User {user_id} is already blocked.")
 
 # /unblock command handler
 @bot.message_handler(commands=['unblock'])
 def unblock_user(message):
     if message.from_user.id != OWNER_ID:
-        bot.reply_to(message, "❌ YOU ARE NOT AUTHORIZED TO USE THIS COMMAND.")
+        bot.reply_to(message, "❌ You are not authorized to use this command.")
         return
 
     args = message.text.split()
     if len(args) != 2:
-        bot.reply_to(message, "ℹ️ USAGE: /UNBLOCK <USER_ID>")
+        bot.reply_to(message, "ℹ️ Usage: /unblock <user_id>")
         return
 
     user_id = int(args[1])
     if user_id in blocked_users:
         blocked_users.remove(user_id)
         save_blocked_users()
-        bot.reply_to(message, f"✅ USER {user_id} HAS BEEN UNBLOCKED.")
+        bot.reply_to(message, f"✅ User {user_id} has been unblocked.")
     else:
-        bot.reply_to(message, f"ℹ️ USER {user_id} IS NOT BLOCKED.")
+        bot.reply_to(message, f"ℹ️ User {user_id} is not blocked.")
 
 # /get_credit command handler
 @bot.message_handler(commands=['get_credit'])
 def get_credit_code(message):
     if message.from_user.id != OWNER_ID:
-        bot.reply_to(message, "❌ YOU ARE NOT AUTHORIZED TO USE THIS COMMAND.")
+        bot.reply_to(message, "❌ You are not authorized to use this command.")
         return
 
     args = message.text.split()
     if len(args) != 2:
-        bot.reply_to(message, "ℹ️ USAGE: /GET_CREDIT <NUMBER_OF_CREDITS>")
+        bot.reply_to(message, "ℹ️ Usage: /get_credit <number_of_credits>")
         return
 
     credits = int(args[1])
     code = generate_random_code()
     credit_codes[code] = credits
     save_credit_codes()
-    bot.reply_to(message, f"✅ CREDIT CODE GENERATED: {code} FOR {credits} CREDITS.")
+    bot.reply_to(message, f"✅ Credit code generated: {code} for {credits} credits.")
 
 # /redeem and /use command handler
 @bot.message_handler(commands=['redeem', 'use'])
 def redeem_code(message):
     if message.from_user.id in blocked_users:
-        bot.reply_to(message, "❌ YOU ARE BLOCKED FROM USING THIS BOT.")
+        bot.reply_to(message, "❌ You are blocked from using this bot.")
         return
 
     args = message.text.split()
     if len(args) != 2:
-        bot.reply_to(message, "ℹ️ USAGE: /REDEEM <CODE> OR /USE <CODE>")
+        bot.reply_to(message, "ℹ️ Usage: /redeem <code> or /use <code>")
         return
 
     code = args[1]
@@ -424,10 +424,11 @@ def redeem_code(message):
         user_id = message.from_user.id
         user_credits[user_id] = user_credits.get(user_id, 0) + credits
         save_user_credits()
-        bot.reply_to(message, f"🎉 YOU HAVE REDEEMED {credits} CREDITS.")
+        bot.reply_to(message, f"🎉 You have redeemed {credits} credits.")
     else:
-        bot.reply_to(message, "❌ INVALID CODE.")
+        bot.reply_to(message, "❌ Invalid code.")
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     bot.polling(none_stop=True)
+                
