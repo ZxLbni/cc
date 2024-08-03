@@ -6,14 +6,14 @@ import time
 import json
 
 # Telegram bot token
-TOKEN = "7386696229:AAGR5SkB6NBqSogG_hUNj_uf0DkwCGKGZYc"
+TOKEN = "7386696229:AAFQ0m0O94-ljMHZdqPD5NMXHciC98HkE9k"
 OWNER_ID = 7427691214  # Owner's Telegram ID
 
 # Initialize the bot
 bot = telebot.TeleBot(TOKEN)
 
 # Define the API endpoint and static parameters
-url = "https://daxxteam.com/chk/chk.php"
+url = "https://daxxteam.com/gate/chk.php"
 
 # Event to control the stopping of the card check process
 stop_event = Event()
@@ -46,32 +46,46 @@ def save_user_credits():
 # Start command handler
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.send_message(message.chat.id, "Welcome! Use the /chk command followed by card details in the format `cc|mm|yyyy|cvv`, or send a TXT file with card details. Use /stop to stop the card check process.")
+    bot.send_message(message.chat.id, "👋 WELCOME! USE /REGISTER TO REGISTER AND GET 10 CREDITS. USE THE /CHK COMMAND FOLLOWED BY CARD DETAILS IN THE FORMAT `CC|MM|YYYY|CVV`, OR SEND A TXT FILE WITH CARD DETAILS. USE /STOP TO STOP THE CARD CHECK PROCESS.")
 
 # /cmds command handler
 @bot.message_handler(commands=['cmds'])
 def send_cmds(message):
     cmds_message = (
-        "Available commands:\n"
-        "/start - Welcome message\n"
-        "/cmds - List all commands\n"
-        "/add - Authorize a group or user\n"
-        "/remove - Unauthorize a group or user\n"
-        "/chk - Check card details\n"
-        "/stop - Stop the card check process\n"
+        "📋 AVAILABLE COMMANDS:\n"
+        "/START - WELCOME MESSAGE\n"
+        "/CMDS - LIST ALL COMMANDS\n"
+        "/REGISTER - REGISTER AND GET 10 CREDITS\n"
+        "/ADD - AUTHORIZE A GROUP OR USER\n"
+        "/REMOVE - UNAUTHORIZE A GROUP OR USER\n"
+        "/CHK - CHECK CARD DETAILS\n"
+        "/STOP - STOP THE CARD CHECK PROCESS\n"
+        "/BUY - VIEW CREDIT PACKAGES AND PRICING\n"
     )
-    bot.send_message(message.chat.id, cmds_message)
+    bot.reply_to(message, cmds_message)
+
+# /register command handler
+@bot.message_handler(commands=['register'])
+def register_user(message):
+    user_id = message.from_user.id
+    if user_id in user_credits:
+        bot.reply_to(message, "✅ YOU ARE ALREADY REGISTERED.")
+        return
+    
+    user_credits[user_id] = 10
+    save_user_credits()
+    bot.reply_to(message, "🎉 YOU HAVE BEEN REGISTERED AND RECEIVED 10 CREDITS.")
 
 # /add command handler to authorize a group or user
 @bot.message_handler(commands=['add'])
 def add_authorization(message):
     if message.from_user.id != OWNER_ID:
-        bot.send_message(message.chat.id, "You are not authorized to use this command.")
+        bot.reply_to(message, "❌ YOU ARE NOT AUTHORIZED TO USE THIS COMMAND.")
         return
 
     args = message.text.split()
     if len(args) < 3:
-        bot.send_message(message.chat.id, "Usage: /add group <group_id> or /add <user_id> <credits>")
+        bot.reply_to(message, "ℹ️ USAGE: /ADD GROUP <GROUP_ID> OR /ADD <USER_ID> <CREDITS>")
         return
 
     if args[1] == 'group':
@@ -79,30 +93,30 @@ def add_authorization(message):
         if group_id not in authorized_groups:
             authorized_groups.append(group_id)
             save_authorized_groups()
-            bot.send_message(message.chat.id, f"Group {group_id} has been authorized for CC checks.")
+            bot.reply_to(message, f"✅ GROUP {group_id} HAS BEEN AUTHORIZED FOR CC CHECKS.")
         else:
-            bot.send_message(message.chat.id, f"Group {group_id} is already authorized.")
+            bot.reply_to(message, f"ℹ️ GROUP {group_id} IS ALREADY AUTHORIZED.")
 
     else:
         if len(args) != 3:
-            bot.send_message(message.chat.id, "Usage: /add <user_id> <credits>")
+            bot.reply_to(message, "ℹ️ USAGE: /ADD <USER_ID> <CREDITS>")
             return
         user_id = int(args[1])
         credits = int(args[2])
         user_credits[user_id] = user_credits.get(user_id, 0) + credits
         save_user_credits()
-        bot.send_message(message.chat.id, f"User {user_id} has been authorized with {credits} credits.")
+        bot.reply_to(message, f"✅ USER {user_id} HAS BEEN AUTHORIZED WITH {credits} CREDITS.")
 
 # /remove command handler to unauthorize a group or user
 @bot.message_handler(commands=['remove'])
 def remove_authorization(message):
     if message.from_user.id != OWNER_ID:
-        bot.send_message(message.chat.id, "You are not authorized to use this command.")
+        bot.reply_to(message, "❌ YOU ARE NOT AUTHORIZED TO USE THIS COMMAND.")
         return
 
     args = message.text.split()
     if len(args) != 3:
-        bot.send_message(message.chat.id, "Usage: /remove group <group_id> or /remove userid <user_id>")
+        bot.reply_to(message, "ℹ️ USAGE: /REMOVE GROUP <GROUP_ID> OR /REMOVE USERID <USER_ID>")
         return
 
     if args[1] == 'group':
@@ -110,47 +124,47 @@ def remove_authorization(message):
         if group_id in authorized_groups:
             authorized_groups.remove(group_id)
             save_authorized_groups()
-            bot.send_message(message.chat.id, f"Group {group_id} has been unauthorized.")
+            bot.reply_to(message, f"✅ GROUP {group_id} HAS BEEN UNAUTHORIZED.")
         else:
-            bot.send_message(message.chat.id, f"Group {group_id} is not authorized.")
+            bot.reply_to(message, f"ℹ️ GROUP {group_id} IS NOT AUTHORIZED.")
 
     elif args[1] == 'userid':
         user_id = int(args[2])
         if user_id in user_credits:
             del user_credits[user_id]
             save_user_credits()
-            bot.send_message(message.chat.id, f"User {user_id} has been unauthorized.")
+            bot.reply_to(message, f"✅ USER {user_id} HAS BEEN UNAUTHORIZED.")
         else:
-            bot.send_message(message.chat.id, f"User {user_id} is not authorized.")
+            bot.reply_to(message, f"ℹ️ USER {user_id} IS NOT AUTHORIZED.")
 
     else:
-        bot.send_message(message.chat.id, "Invalid type. Use 'group' or 'userid'.")
+        bot.reply_to(message, "❌ INVALID TYPE. USE 'GROUP' OR 'USERID'.")
 
 # /chk command handler
 @bot.message_handler(commands=['chk'])
 def check_card(message):
     user_id = message.from_user.id
     if user_id != OWNER_ID and user_id not in user_credits and message.chat.id not in authorized_groups:
-        bot.send_message(message.chat.id, "You are not authorized to use this command.")
+        bot.reply_to(message, "❌ YOU ARE NOT AUTHORIZED TO USE THIS COMMAND.")
         return
 
-    if user_id in user_credits and user_credits[user_id] <= 0:
-        bot.send_message(message.chat.id, "You don't have enough credits to use this command.")
+    if user_id != OWNER_ID and user_credits.get(user_id, 0) <= 0:
+        bot.reply_to(message, "❌ YOU DON'T HAVE ENOUGH CREDITS TO USE THIS COMMAND.")
         return
 
     card_details = message.text.split()[1:]
     if not card_details:
-        bot.send_message(message.chat.id, "Please provide card details in the format `cc|mm|yyyy|cvv`.")
+        bot.reply_to(message, "ℹ️ PLEASE PROVIDE CARD DETAILS IN THE FORMAT `CC|MM|YYYY|CVV`.")
         return
 
     stop_event.clear()
 
     for card in card_details:
         if stop_event.is_set():
-            bot.send_message(message.chat.id, "Card check process stopped.")
+            bot.reply_to(message, "🛑 CARD CHECK PROCESS STOPPED.")
             break
 
-        if user_id in user_credits:
+        if user_id != OWNER_ID:
             user_credits[user_id] -= 1
             save_user_credits()
 
@@ -161,18 +175,22 @@ def check_card(message):
             'amount': 0.5,
             'currency': 'eur'
         }
-        response = requests.get(url, params=params)
-        end_time = time.time()
+        try:
+            response = requests.get(url, params=params)
+            end_time = time.time()
+        except requests.exceptions.RequestException as e:
+            bot.reply_to(message, f"❌ ERROR CONNECTING TO API: {e}")
+            continue
         
         if response.headers.get('Content-Type') == 'application/json':
             try:
                 response_data = response.json()
-                bot.send_message(message.chat.id, response_data.get("response", "No response"))
+                bot.reply_to(message, response_data.get("response", "ℹ️ NO RESPONSE"))
             except requests.exceptions.JSONDecodeError:
-                bot.send_message(message.chat.id, f"Failed to decode JSON response. Response content: {response.text}")
+                bot.reply_to(message, f"❌ FAILED TO DECODE JSON RESPONSE. RESPONSE CONTENT: {response.text}")
                 continue
         else:
-            bot.send_message(message.chat.id, response.text)
+            bot.reply_to(message, response.text)
 
         time.sleep(10)
 
@@ -180,12 +198,12 @@ def check_card(message):
 @bot.message_handler(content_types=['document'])
 def handle_file(message):
     user_id = message.from_user.id
-    if user_id != OWNER_ID and user_id not in user_credits and message.chat.id not in authorized_groups:
-        bot.send_message(message.chat.id, "You are not authorized to use this command.")
+    if user_id not in user_credits and user_id != OWNER_ID:
+        bot.reply_to(message, "❌ YOU ARE NOT REGISTERED. USE /REGISTER TO REGISTER.")
         return
 
-    if user_id in user_credits and user_credits[user_id] <= 0:
-        bot.send_message(message.chat.id, "You don't have enough credits to use this command.")
+    if user_id != OWNER_ID and user_credits.get(user_id, 0) <= 0:
+        bot.reply_to(message, "❌ YOU DON'T HAVE ENOUGH CREDITS TO USE THIS COMMAND.")
         return
 
     if message.document.mime_type == 'text/plain':
@@ -202,10 +220,10 @@ def handle_file(message):
 
         for lista in lista_values:
             if stop_event.is_set():
-                bot.send_message(message.chat.id, "Card check process stopped.")
+                bot.reply_to(message, "🛑 CARD CHECK PROCESS STOPPED.")
                 break
 
-            if user_id in user_credits:
+            if user_id != OWNER_ID:
                 user_credits[user_id] -= 1
                 save_user_credits()
 
@@ -218,18 +236,22 @@ def handle_file(message):
                     'amount': 0.5,
                     'currency': 'eur'
                 }
-                response = requests.get(url, params=params)
-                end_time = time.time()
+                try:
+                    response = requests.get(url, params=params)
+                    end_time = time.time()
+                except requests.exceptions.RequestException as e:
+                    bot.reply_to(message, f"❌ ERROR CONNECTING TO API: {e}")
+                    continue
                 
                 if response.headers.get('Content-Type') == 'application/json':
                     try:
                         response_data = response.json()
-                        bot.send_message(message.chat.id, response_data.get("response", "No response"))
+                        bot.reply_to(message, response_data.get("response", "ℹ️ NO RESPONSE"))
                     except requests.exceptions.JSONDecodeError:
-                        bot.send_message(message.chat.id, f"Failed to decode JSON response. Response content: {response.text}")
+                        bot.reply_to(message, f"❌ FAILED TO DECODE JSON RESPONSE. RESPONSE CONTENT: {response.text}")
                         continue
                 else:
-                    bot.send_message(message.chat.id, response.text)
+                    bot.reply_to(message, response.text)
 
                 time.sleep(10)
 
@@ -238,9 +260,21 @@ def handle_file(message):
 def stop_process(message):
     if message.from_user.id == OWNER_ID:
         stop_event.set()
-        bot.send_message(message.chat.id, "Card check process has been stopped.")
+        bot.reply_to(message, "🛑 CARD CHECK PROCESS HAS BEEN STOPPED.")
     else:
-        bot.send_message(message.chat.id, "You are not authorized to use this command.")
+        bot.reply_to(message, "❌ YOU ARE NOT AUTHORIZED TO USE THIS COMMAND.")
+
+# /buy command handler
+@bot.message_handler(commands=['buy'])
+def buy_credits(message):
+    buy_message = (
+        "💳 CREDIT PACKAGES:\n"
+        "100 CREDITS - $10\n"
+        "500 CREDITS - $45\n"
+        "1000 CREDITS - $80\n"
+        "CONTACT @OWNER_USERNAME TO PURCHASE."
+    )
+    bot.reply_to(message, buy_message)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
