@@ -13,7 +13,7 @@ OWNER_ID = 7427691214  # Owner's Telegram ID
 bot = telebot.TeleBot(TOKEN)
 
 # Define the API endpoint and static parameters
-url = "https://daxxteam.com/gate/chk.php"
+url = "https://daxxteam.com/chk/api.php"
 
 # Event to control the stopping of the card check process
 stop_event = Event()
@@ -56,6 +56,7 @@ def send_cmds(message):
         "/START - WELCOME MESSAGE\n"
         "/CMDS - LIST ALL COMMANDS\n"
         "/REGISTER - REGISTER AND GET 10 CREDITS\n"
+        "/INFO - GET YOUR INFORMATION\n"
         "/ADD - AUTHORIZE A GROUP OR USER\n"
         "/REMOVE - UNAUTHORIZE A GROUP OR USER\n"
         "/CHK - CHECK CARD DETAILS\n"
@@ -75,6 +76,29 @@ def register_user(message):
     user_credits[user_id] = 10
     save_user_credits()
     bot.reply_to(message, "🎉 YOU HAVE BEEN REGISTERED AND RECEIVED 10 CREDITS.")
+
+# /info command handler
+@bot.message_handler(commands=['info'])
+def user_info(message):
+    user_id = message.from_user.id
+    if user_id not in user_credits and user_id != OWNER_ID:
+        bot.reply_to(message, "❌ YOU ARE NOT REGISTERED. USE /REGISTER TO REGISTER.")
+        return
+
+    credits = "UNLIMITED" if user_id == OWNER_ID else user_credits.get(user_id, 0)
+    rank = "OWNER" if user_id == OWNER_ID else "PREMIUM" if credits > 0 else "FREE"
+    username = message.from_user.username or "N/A"
+    full_name = f"{message.from_user.first_name} {message.from_user.last_name or ''}".strip()
+    
+    info_message = (
+        f"ℹ️ USER INFORMATION:\n"
+        f"👤 USERNAME: {username}\n"
+        f"🆔 USER ID: {user_id}\n"
+        f"📛 FULL NAME: {full_name}\n"
+        f"💰 CREDITS: {credits}\n"
+        f"🔰 RANK: {rank}\n"
+    )
+    bot.reply_to(message, info_message)
 
 # /add command handler to authorize a group or user
 @bot.message_handler(commands=['add'])
