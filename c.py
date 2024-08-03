@@ -269,10 +269,10 @@ def stop_process(message):
 def buy_credits(message):
     buy_message = (
         "💳 CREDIT PACKAGES:\n"
-        "100 CREDITS - $10\n"
-        "500 CREDITS - $45\n"
-        "1000 CREDITS - $80\n"
-        "CONTACT @OWNER_USERNAME TO PURCHASE."
+        "100 CREDITS - $1\n"
+        "500 CREDITS - $5\n"
+        "1000 CREDITS - $8\n"
+        "CONTACT @YourExDestiny TO PURCHASE."
     )
     bot.reply_to(message, buy_message)
 
