@@ -129,7 +129,7 @@ def user_info(message):
         return
 
     credits = "Unlimited" if user_id == OWNER_ID else user_credits.get(user_id, 0)
-    rank = "Owner" if user_id == OWNER_ID else "Premium" if credits > 0 else "Free"
+    rank = "Owner" if user_id == OWNER_ID else "Premium" if credits > 10 else "Free"
     username = message.from_user.username or "N/A"
     full_name = f"{message.from_user.first_name} {message.from_user.last_name or ''}".strip()
     
@@ -438,7 +438,7 @@ def users_stats(message):
         return
 
     total_users = len(user_credits)
-    free_users = sum(1 for credits in user_credits.values() if credits == 0)
+    free_users = sum(1 for credits in user_credits.values() if credits <= 10)
     premium_users = total_users - free_users
     total_groups = len(authorized_groups)
 
@@ -475,4 +475,4 @@ def broadcast_message(message):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     bot.polling(none_stop=True)
-        
+    
