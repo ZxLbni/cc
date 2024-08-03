@@ -15,7 +15,7 @@ OWNER_ID = 7427691214  # Owner's Telegram ID
 bot = telebot.TeleBot(TOKEN)
 
 # Define the API endpoint and static parameters
-url = "https://daxxteam.com/chk/chk.php"
+url = "https://daxxteam.com/chk/api.php"
 
 # Event to control the stopping of the card check process
 stop_event = Event()
@@ -97,6 +97,8 @@ def send_cmds(message):
         "/get_credit <number> - Generate credit code\n"
         "/redeem <code> - Redeem a credit code\n"
         "/use <code> - Redeem a credit code\n"
+        "/users - Get user statistics (owner only)\n"
+        "/br <message> - Broadcast a message to all users (owner only)\n"
     )
     bot.reply_to(message, cmds_message)
 
@@ -428,7 +430,49 @@ def redeem_code(message):
     else:
         bot.reply_to(message, "❌ Invalid code.")
 
+# /users command handler (owner only)
+@bot.message_handler(commands=['users'])
+def users_stats(message):
+    if message.from_user.id != OWNER_ID:
+        bot.reply_to(message, "❌ You are not authorized to use this command.")
+        return
+
+    total_users = len(user_credits)
+    free_users = sum(1 for credits in user_credits.values() if credits == 0)
+    premium_users = total_users - free_users
+    total_groups = len(authorized_groups)
+
+    stats_message = (
+        f"📊 User Statistics:\n"
+        f"👥 Total users: {total_users}\n"
+        f"🆓 Free users: {free_users}\n"
+        f"💎 Premium users: {premium_users}\n"
+        f"👥 Total groups: {total_groups}\n"
+    )
+    bot.reply_to(message, stats_message)
+
+# /br command handler (owner only)
+@bot.message_handler(commands=['br'])
+def broadcast_message(message):
+    if message.from_user.id != OWNER_ID:
+        bot.reply_to(message, "❌ You are not authorized to use this command.")
+        return
+
+    args = message.text.split(' ', 1)
+    if len(args) != 2:
+        bot.reply_to(message, "ℹ️ Usage: /br <message>")
+        return
+
+    broadcast_msg = args[1]
+    for user_id in user_credits.keys():
+        try:
+            bot.send_message(user_id, f"📢 Broadcast message:\n\n{broadcast_msg}")
+        except Exception as e:
+            logging.error(f"Error sending message to {user_id}: {e}")
+
+    bot.reply_to(message, "✅ Broadcast message sent to all users.")
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     bot.polling(none_stop=True)
-                
+        
