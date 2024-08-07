@@ -8,7 +8,7 @@ import random
 import string
 
 # Telegram bot token
-TOKEN = "7386696229:AAFQ0m0O94-ljMHZdqPD5NMXHciC98HkE9k"
+TOKEN = "7386696229:AAEQqdmS7OMC54uVWAuZNdOK0TEhJwwYzB0"
 OWNER_ID = 7427691214  # Owner's Telegram ID
 
 # Initialize the bot
