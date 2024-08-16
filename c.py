@@ -15,7 +15,7 @@ OWNER_ID = 7427691214  # Owner's Telegram ID
 bot = telebot.TeleBot(TOKEN)
 
 # Define the API endpoint and static parameters
-url = "https://daxxteam.com/api.php"
+url = "https://daxx.slayerop.in/api.php"
 
 # Event to control the stopping of the card check process
 stop_event = Event()
