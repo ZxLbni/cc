@@ -255,8 +255,8 @@ def check_card(message):
         params = {
             'lista': card,
             'mode': 'cvv',
-            'amount': 0.5,
-            'currency': 'eur'
+            'amount': 1,
+            'currency': 'usd'
         }
         try:
             response = requests.get(url, params=params)
@@ -319,8 +319,8 @@ def handle_file(message):
                 params = {
                     'lista': lista,
                     'mode': 'cvv',
-                    'amount': 0.5,
-                    'currency': 'eur'
+                    'amount': 1,
+                    'currency': 'usd'
                 }
                 try:
                     response = requests.get(url, params=params)
