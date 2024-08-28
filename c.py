@@ -119,6 +119,10 @@ def multi_kill_gate(client, message):
         mkill_details = message.reply_to_message.text.strip().split("\n")
     else:
         parts = message.text.split(" ", 2)
+        if len(parts) < 3:
+            message.reply_text("**Invalid command format. Use: /mkill max_cards cc1|mm1|yyyy1|cvv1\\ncc2|mm2|yyyy2|cvv2 ...**")
+            return
+        
         max_cards = int(parts[1])
         mkill_details = parts[2].strip().split("\n")
 
@@ -195,4 +199,4 @@ def get_all_users_info(client, message):
     message.reply_text(final_result)
 
 app.run()
-    
+        
