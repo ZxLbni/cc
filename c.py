@@ -67,7 +67,7 @@ def kill_gate(client, message):
 
     results = []
 
-    for i in range(5):
+    for i in range(1):
         # Step message (not editing but updating results list)
         results.append(f"**Processing request {i+1}**")
 
