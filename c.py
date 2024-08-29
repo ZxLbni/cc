@@ -22,7 +22,7 @@ approved_users = set()
 
 admin_ids = {7427691214}
 
-channel_id = -1002237336934
+channel_id = -1002196680748
 
 def divide_by_100(amount):
     return amount / 100
@@ -256,7 +256,7 @@ async def process_card(event, base_url, card_details, check_type, unique_id, use
                                          f"➩ 𝗠𝗲𝘀𝘀𝗮𝗴𝗲: `{message_text}`\n\n"
                                          f"➩ 𝗖𝗵𝗲𝗰𝗸𝗲𝗱 𝗕𝘆: {first_name}\n\n")
                         buttons = [
-                            [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=5548345923'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=6460703454')]
+                            [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=7427691214'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=7427691214')]
                         ]
                         await event.reply(ok_cc_message, buttons=buttons, link_preview=False)
                         await client.send_message(channel_id, ok_cc_message, buttons=buttons, link_preview=False)
@@ -285,7 +285,7 @@ async def process_card(event, base_url, card_details, check_type, unique_id, use
                                          f"➩ 𝗠𝗲𝘀𝘀𝗮𝗴𝗲: `{message_text}`\n\n"
                                          f"➩ 𝗖𝗵𝗲𝗰𝗸𝗲𝗱 𝗕𝘆: {first_name}\n\n")
                         buttons = [
-                            [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=5548345923'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=6460703454')]
+                            [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=7427691214'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=7427691214')]
                         ]
                         await event.reply(ok_cc_message, buttons=buttons, link_preview=False)
                         await client.send_message(channel_id, ok_cc_message, buttons=buttons, link_preview=False)
@@ -306,7 +306,7 @@ async def process_card(event, base_url, card_details, check_type, unique_id, use
                           f"𝐓𝐨𝐭𝐚𝐥 𝐂𝐂𝐬: {user_counts['checked_cc_count']}/{user_counts['total_cc_count']}\n"
                           f"𝐆𝐞𝐭 𝐫𝐞𝐬𝐮𝐥𝐭𝐬 𝐛𝐲 /get {unique_id}")
             buttons = [
-                [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=5548345923'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=6460703454')]
+                [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=7427691214'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=7427691214')]
             ]
             await message.edit(update_msg, buttons=buttons)
 
@@ -323,7 +323,7 @@ async def process_card(event, base_url, card_details, check_type, unique_id, use
                           f"𝐓𝐨𝐭𝐚𝐥 𝐂𝐂𝐬: {user_counts['checked_cc_count']}/{user_counts['total_cc_count']}\n"
                           f"𝐆𝐞𝐭 𝐫𝐞𝐬𝐮𝐥𝐭𝐬 𝐛𝐲 `/get {unique_id}`")
             buttons = [
-                [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=5548345923'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=6460703454')]
+                [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=7427691214'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=7427691214')]
             ]
             await message.edit(update_msg, buttons=buttons)
 
@@ -331,3 +331,4 @@ async def process_card(event, base_url, card_details, check_type, unique_id, use
 
 client.start()
 client.run_until_disconnected()
+                        
