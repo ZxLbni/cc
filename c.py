@@ -8,7 +8,7 @@ api_id = '27649783'
 api_hash = '834fd6015b50b781e0f8a41876ca95c8'
 
 # Replace YOUR_BOT_TOKEN with your actual Telegram bot token
-bot_token = '7386696229:AAG7k96MBOBl4hfJA7_ldUSzZC9XTDFRzhA'
+bot_token = '7386696229:AAEPXkf7KTFYwwu28L43Rpb5E6TGCGWhrag'
 
 REQUEST_DELAY = 5
 
