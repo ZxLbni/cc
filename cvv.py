@@ -221,7 +221,7 @@ async def process_card(event, base_url, card_details, check_type, unique_id, use
                 divided_amount = divide_by_100(amount)
                 last_card_response = f"Payment Successful! Amount: {divided_amount} {response_data.get('currency', '')}"
                 success_message = (f"┏━━━━━━━⍟\n"
-                                   f"┃ {check_type} 𝐂𝐇𝐀𝐑𝐆𝐄 15$ ✅\n"
+                                   f"┃ {check_type} 𝐂𝐇𝐀𝐑𝐆𝐄 5$ ✅\n"
                                    f"┗━━━━━━━━━━━⊛\n"
                                    f"➩ 𝗖𝗮𝗿𝗱: `{card}`\n"
                                    f"➩ 𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲: *Payment Successful!✅*\n"
@@ -248,7 +248,7 @@ async def process_card(event, base_url, card_details, check_type, unique_id, use
 
                     if message_text == "Your card's security code is incorrect." or decline_reason in ["incorrect_cvc", "insufficient_funds", "transaction_not_allowed"]:
                         ok_cc_message = (f"┏━━━━━━━⍟\n"
-                                         f"┃ {check_type} 𝐂𝐇𝐀𝐑𝐆𝐄 15$ ✅\n"
+                                         f"┃ {check_type} 𝐂𝐇𝐀𝐑𝐆𝐄 5$ ✅\n"
                                          f"┗━━━━━━━━━━━⊛\n"
                                          f"➩ 𝗖𝗮𝗿𝗱: `{card}`\n"
                                          f"➩ 𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲: *APPROVED CARD*\n"
@@ -277,7 +277,7 @@ async def process_card(event, base_url, card_details, check_type, unique_id, use
 
                     if message_text == "Your card's security code is incorrect." or decline_reason in ["incorrect_cvc", "insufficient_funds", "transaction_not_allowed"]:
                         ok_cc_message = (f"┏━━━━━━━⍟\n"
-                                         f"┃ {check_type} 𝐂𝐇𝐀𝐑𝐆𝐄 15$ ✅\n"
+                                         f"┃ {check_type} 𝐂𝐇𝐀𝐑𝐆𝐄 5$ ✅\n"
                                          f"┗━━━━━━━━━━━⊛\n"
                                          f"➩ 𝗖𝗮𝗿𝗱: `{card}`\n"
                                          f"➩ 𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲: *APPROVED CC*\n"
