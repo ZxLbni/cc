@@ -14,8 +14,8 @@ REQUEST_DELAY = 5
 
 client = TelegramClient('bots', api_id, api_hash).start(bot_token=bot_token)
 
-CCN_BASE_URL = "https://ugin-376ec3a40d16.herokuapp.com/cvv"
-CVV_BASE_URL = "https://ugin-376ec3a40d16.herokuapp.com/cvv"
+CCN_BASE_URL = "https://apicc-8027138a4f00.herokuapp.com/checker"
+CVV_BASE_URL = "https://apicc-8027138a4f00.herokuapp.com/checker"
 
 # List to keep track of approved users
 approved_users = set()
