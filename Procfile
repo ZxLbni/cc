@@ -1,1 +1,1 @@
-web: python c.py
+web: python cvv.py
