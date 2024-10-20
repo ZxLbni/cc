@@ -1,7 +1,7 @@
 import requests
 from pyrogram import Client, filters
 
-# Replace these with your actual API ID, API HASH, and BOT TOKEN
+# Your API ID and Hash
 API_ID = 24509589
 API_HASH = "717cf21d94c4934bcbe1eaa1ad86ae75"
 BOT_TOKEN = "7386696229:AAETBUAX4p2QdMQmr6b9NbZc_vOJx4uQOi0"
@@ -9,8 +9,8 @@ BOT_TOKEN = "7386696229:AAETBUAX4p2QdMQmr6b9NbZc_vOJx4uQOi0"
 # Your Telegram ID (owner ID)
 OWNER_ID = 7427691214
 
-# Initialize the bot
-app = Client("card_checker_bot", bot_token=BOT_TOKEN)
+# Initialize the bot with API ID and Hash
+app = Client("card_checker_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
 # Function to check card details
 def check_cards(card_numbers):
