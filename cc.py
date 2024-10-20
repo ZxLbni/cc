@@ -55,29 +55,30 @@ def chk(client, message):
 
     # Check if result is a list
     if isinstance(result, list):
-        for card, status in zip(card_numbers, result):
+        for status in result:  # Iterate over each card status
+            card = status.get("card", "Unknown Card")
             card_status = status.get("status", "Unknown")
             message_detail = status.get("message", "No message available")
 
+            # Format each message in bold
             if card_status.lower() == "approved":
-                # Assuming a fixed price for approved cards
                 price = "1$"
                 response_message += (
                     f"┏━━━━━━━⍟\n"
                     f"┃# CHARGE {price} ✅\n"
                     f"┗━━━━━━━━━━━⊛\n"
-                    f"CARD: {card}\n"
-                    f"RESPONSE: {card_status}\n"
-                    f"MSG: {message_detail}\n\n"
+                    f"CARD: **{card}**\n"
+                    f"RESPONSE: **{card_status}**\n"
+                    f"MSG: **{message_detail}**\n\n"
                 )
             else:
                 response_message += (
                     f"┏━━━━━━━⍟\n"
                     f"┃# DEAD ❌\n"
                     f"┗━━━━━━━━━━━⊛\n"
-                    f"CARD: {card}\n"
-                    f"RESPONSE: {card_status}\n"
-                    f"MSG: {message_detail}\n\n"
+                    f"CARD: **{card}**\n"
+                    f"RESPONSE: **{card_status}**\n"
+                    f"MSG: **{message_detail}**\n\n"
                 )
     else:
         # Handle case where result is not a list, maybe log the error
