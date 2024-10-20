@@ -19,7 +19,7 @@ def check_cards(card_numbers):
     response = requests.post(url, json=data)
     
     if response.status_code == 200:
-        return response.json()
+        return response.json()  # This should return the response JSON
     else:
         return {"error": "Failed to retrieve data from the server."}
 
@@ -52,33 +52,40 @@ def chk(client, message):
 
     # Format the response
     response_message = ""
-    for card, status in zip(card_numbers, result.get("results", [])):
-        card_status = status.get("status", "Unknown")
-        message_detail = status.get("message", "No message available")
-        
-        if card_status.lower() == "approved":
-            # Assuming a fixed price for approved cards
-            price = "1$"
-            response_message += (
-                f"┏━━━━━━━⍟\n"
-                f"┃# CHARGE {price} ✅\n"
-                f"┗━━━━━━━━━━━⊛\n"
-                f"CARD: {card}\n"
-                f"RESPONSE: {card_status}\n"
-                f"MSG: {message_detail}\n\n"
-            )
-        else:
-            response_message += (
-                f"┏━━━━━━━⍟\n"
-                f"┃# DEAD ❌\n"
-                f"┗━━━━━━━━━━━⊛\n"
-                f"CARD: {card}\n"
-                f"RESPONSE: {card_status}\n"
-                f"MSG: {message_detail}\n\n"
-            )
+
+    # Check if result is a list
+    if isinstance(result, list):
+        for card, status in zip(card_numbers, result):
+            card_status = status.get("status", "Unknown")
+            message_detail = status.get("message", "No message available")
+
+            if card_status.lower() == "approved":
+                # Assuming a fixed price for approved cards
+                price = "1$"
+                response_message += (
+                    f"┏━━━━━━━⍟\n"
+                    f"┃# CHARGE {price} ✅\n"
+                    f"┗━━━━━━━━━━━⊛\n"
+                    f"CARD: {card}\n"
+                    f"RESPONSE: {card_status}\n"
+                    f"MSG: {message_detail}\n\n"
+                )
+            else:
+                response_message += (
+                    f"┏━━━━━━━⍟\n"
+                    f"┃# DEAD ❌\n"
+                    f"┗━━━━━━━━━━━⊛\n"
+                    f"CARD: {card}\n"
+                    f"RESPONSE: {card_status}\n"
+                    f"MSG: {message_detail}\n\n"
+                )
+    else:
+        # Handle case where result is not a list, maybe log the error
+        message.reply("Unexpected response format from the server.")
 
     # Send the formatted response
-    message.reply(response_message)
+    if response_message:  # Only send if there is a message to send
+        message.reply(response_message)
 
 # Run the bot
 if __name__ == "__main__":
