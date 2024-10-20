@@ -21,20 +21,20 @@ def check_cards(card_numbers):
     if response.status_code == 200:
         return response.json()  # This should return the response JSON
     else:
-        return {"error": "Failed to retrieve data from the server."}
+        return [{"card": card, "status": "error", "message": "Failed to retrieve data from the server."} for card in card_numbers]
 
 @app.on_message(filters.command("start"))
 def start(client, message):
-    message.reply("Welcome to the Card Checker Bot! Use /chk followed by your card details.")
+    message.reply("Welcome to the Card Checker Bot! Use /mchk followed by your card details.")
 
-@app.on_message(filters.command("chk") & filters.user(OWNER_ID))
-def chk(client, message):
+@app.on_message(filters.command("mchk") & filters.user(OWNER_ID))
+def mchk(client, message):
     # Check if the user has provided card numbers
     if len(message.command) < 2:
-        message.reply("Please enter card numbers in the format: /chk card1|expiry_month|expiry_year|cvv")
+        message.reply("Please enter up to 25 card numbers in the format: /mchk card1|expiry_month|expiry_year|cvv")
         return
 
-    # Prepare the card data from user input
+    # Prepare the card data from user input, limiting to 25 cards
     card_data = message.command[1:]  # Get all arguments after the command
     card_numbers = []
 
@@ -45,6 +45,11 @@ def chk(client, message):
 
     if not card_numbers:
         message.reply("Invalid card format. Please use: card_number|expiry_month|expiry_year|cvv")
+        return
+
+    # Limit to 25 cards
+    if len(card_numbers) > 25:
+        message.reply("You can only check up to 25 cards at a time.")
         return
 
     # Check the cards
@@ -58,28 +63,12 @@ def chk(client, message):
         for status in result:  # Iterate over each card status
             card = status.get("card", "Unknown Card")
             card_status = status.get("status", "Unknown")
-            message_detail = status.get("message", "No message available")
 
             # Format each message in bold
-            if card_status.lower() == "approved":
-                price = "1$"
-                response_message += (
-                    f"┏━━━━━━━⍟\n"
-                    f"┃# CHARGE {price} ✅\n"
-                    f"┗━━━━━━━━━━━⊛\n"
-                    f"CARD: **{card}**\n"
-                    f"RESPONSE: **{card_status}**\n"
-                    f"MSG: **{message_detail}**\n\n"
-                )
-            else:
-                response_message += (
-                    f"┏━━━━━━━⍟\n"
-                    f"┃# DEAD ❌\n"
-                    f"┗━━━━━━━━━━━⊛\n"
-                    f"CARD: **{card}**\n"
-                    f"RESPONSE: **{card_status}**\n"
-                    f"MSG: **{message_detail}**\n\n"
-                )
+            response_message += (
+                f"**CARD: {card}**\n"
+                f"**RESPONSE: {card_status}**\n\n"
+            )
     else:
         # Handle case where result is not a list, maybe log the error
         message.reply("Unexpected response format from the server.")
