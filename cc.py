@@ -12,6 +12,21 @@ OWNER_ID = 7427691214
 # Initialize the bot with API ID and Hash
 app = Client("card_checker_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
+# Function to validate card number using Luhn's algorithm
+def check_luhn(card_number):
+    digits = [int(d) for d in card_number if d.isdigit()]
+    checksum = 0
+
+    # Reverse the order of digits and apply Luhn's algorithm
+    for i, digit in enumerate(reversed(digits)):
+        if i % 2 == 1:  # Double every second digit
+            digit *= 2
+            if digit > 9:  # If the result is greater than 9, subtract 9
+                digit -= 9
+        checksum += digit
+
+    return checksum % 10 == 0  # Valid if the checksum is a multiple of 10
+
 # Function to check card details
 def check_cards(card_numbers):
     url = "http://154.12.225.214:1440/check_cards"
@@ -40,7 +55,12 @@ def chk(client, message):
     for card in card_data:
         card_details = card.split('|')
         if len(card_details) == 4:
-            card_numbers.append(card)
+            card_number = card_details[0]
+            if check_luhn(card_number):  # Validate the card number using Luhn's algorithm
+                card_numbers.append(card)
+            else:
+                message.reply(f"INVALID CARD NUMBER: {card_number} ❌")
+                return
 
     if not card_numbers:
         message.reply("INVALID CARD FORMAT. PLEASE USE: CARD_NUMBER|EXPIRY_MONTH|EXPIRY_YEAR|CVV")
@@ -57,7 +77,14 @@ def chk(client, message):
         for status in result:  # Assuming we get one card status in the list
             card = status.get("card", "UNKNOWN CARD").upper()
             card_status = status.get("status", "UNKNOWN").upper()
-            message_detail = status.get("message", "NO MESSAGE AVAILABLE").upper()
+            message_detail = status.get("message")  # Don't set default here
+
+            # Check if the message is None and set a default
+            if message_detail is None:
+                message_detail = "NO MESSAGE AVAILABLE"
+
+            # Format message to uppercase
+            message_detail = message_detail.upper()
 
             # Append the appropriate emoji based on the card status
             if card_status == "APPROVED":
@@ -92,7 +119,12 @@ def mchk(client, message):
     for card in card_data:
         card_details = card.split('|')
         if len(card_details) == 4:
-            card_numbers.append(card)
+            card_number = card_details[0]
+            if check_luhn(card_number):  # Validate the card number using Luhn's algorithm
+                card_numbers.append(card)
+            else:
+                message.reply(f"INVALID CARD NUMBER: {card_number} ❌")
+                return
 
     if not card_numbers:
         message.reply("INVALID CARD FORMAT. PLEASE USE: CARD_NUMBER|EXPIRY_MONTH|EXPIRY_YEAR|CVV")
@@ -114,6 +146,14 @@ def mchk(client, message):
         for status in result:  # Iterate over each card status
             card = status.get("card", "UNKNOWN CARD").upper()
             card_status = status.get("status", "UNKNOWN").upper()
+            message_detail = status.get("message")  # Don't set default here
+
+            # Check if the message is None and set a default
+            if message_detail is None:
+                message_detail = "NO MESSAGE AVAILABLE"
+
+            # Format message to uppercase
+            message_detail = message_detail.upper()
 
             # Append the appropriate emoji based on the card status
             if card_status == "APPROVED":
@@ -124,7 +164,8 @@ def mchk(client, message):
             # Format each message in bold
             response_message += (
                 f"**CARD: {card}**\n"
-                f"**RESPONSE: {card_status}**\n\n"
+                f"**RESPONSE: {card_status}**\n"
+                f"**MSG: {message_detail}**\n\n"
             )
     else:
         # Handle case where result is not a list, maybe log the error
