@@ -4,7 +4,7 @@ from pyrogram import Client, filters
 # Your API ID and Hash
 API_ID = 24509589
 API_HASH = "717cf21d94c4934bcbe1eaa1ad86ae75"
-BOT_TOKEN = "7386696229:AAETBUAX4p2QdMQmr6b9NbZc_vOJx4uQOi0"
+BOT_TOKEN = "7625505683:AAGYlnhZG2cBRz0RMg1yK_zFUUk_3Em5ods"
 
 # Your Telegram ID (owner ID)
 OWNER_ID = 7427691214
