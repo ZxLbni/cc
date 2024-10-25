@@ -7,7 +7,7 @@ API_HASH = "717cf21d94c4934bcbe1eaa1ad86ae75"
 BOT_TOKEN = "7625505683:AAGYlnhZG2cBRz0RMg1yK_zFUUk_3Em5ods"
 
 # Your Telegram ID (owner ID)
-OWNER_ID = 7427691214
+OWNER_ID = 6742022802
 
 # Initialize the bot with API ID and Hash
 app = Client("card_checker_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
